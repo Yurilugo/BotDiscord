@@ -87,64 +87,96 @@ async def on_message(message):
 
     #paises
     if message.content.startswith('!pais'):
-        pais = message.content.split(' ')[1]
-        infoPais = requests.get(f'https://restcountries.com/v3.1/name/{pais}')
-        infoClima = requests.get(f'https://weatherdbi.herokuapp.com/data/weather/{pais}')
-            
+        if len(message.content) > 5:
+            pais = message.content.split(' ')[1]
 
-        responsePais = infoPais.json()
-        bandera = responsePais[0]['flags']['png'] 
-        nombre = responsePais[0]['name']['common']
-        capital = responsePais[0]['capital'][0]
-        region = responsePais[0]['region']
-        poblacion = responsePais[0]['population']
-
-
-        responseClima = infoClima.json()
-        hora = responseClima['currentConditions']['dayhour']
-        temperatura = responseClima['currentConditions']['temp']['c']
-        clima = responseClima['currentConditions']['comment']
-        climaimg = responseClima['currentConditions']['iconURL']
+            infoPais = requests.get(f'https://restcountries.com/v3.1/name/{pais}')
+            responsePais = infoPais.json()
+            bandera = responsePais[0]['flags']['png'] 
+            nombre = responsePais[0]['name']['common']
+            capital = responsePais[0]['capital'][0]
+            region = responsePais[0]['region']
+            poblacion = responsePais[0]['population']
 
 
-
-        await message.channel.send(f'Hello, <@{message.author.id}>')
-        await message.channel.send(bandera)
-        await message.channel.send(f'Country :  {nombre}')
-        await message.channel.send(f'Capital :  {capital}')
-        await message.channel.send(f'Region : {region}')
-        await message.channel.send(f'Population : {poblacion}')
-        await message.channel.send(f'Day and hour :  {hora}')
-        await message.channel.send(f'Temperature at this time :  {temperatura}°C')
-        await message.channel.send(f'The weather at this time :  {clima}')
-        await message.channel.send(climaimg)
+            infoClima = requests.get(f'https://weatherdbi.herokuapp.com/data/weather/{pais}')
+            responseClima = infoClima.json()
+            hora = responseClima['currentConditions']['dayhour']
+            temperatura = responseClima['currentConditions']['temp']['c']
+            clima = responseClima['currentConditions']['comment']
+            climaimg = responseClima['currentConditions']['iconURL']
 
 
+            await message.channel.send(f'Hello, <@{message.author.id}>')
+            await message.channel.send(bandera)
+            await message.channel.send(f'Country :  {nombre}')
+            await message.channel.send(f'Capital :  {capital}')
+            await message.channel.send(f'Region : {region}')
+            await message.channel.send(f'Population : {poblacion}')
+            await message.channel.send(f'Day and hour :  {hora}')
+            await message.channel.send(f'Temperature at this time :  {temperatura}°C')
+            await message.channel.send(f'The weather at this time :  {clima}')
+            await message.channel.send(climaimg)
+
+        else:
+            ip =  requests.get(f'https://api.geoapify.com/v1/ipinfo?&apiKey=66931cf4d4bd40259dafee5d6d898138')
+            response_ip = ip.json()
+            paisIp = response_ip['country']['names']['de']
 
 
-    # #Crear un Usuario 
-    # if message.content.startswith('!CrearUsuario'):
-    #     first_name = message.content.split(' ')[1]
-    #     last_name = message.content.split(' ')[2]
-    #     full_name = f'{first_name} {last_name}'
-    #     email = message.content.split(' ')[3]
-    #     password = message.content.split(' ')[4]
-    #     confirm_pass = message.content.split(' ')[5]
-
-    #     response = requests.post('http://api.cup2022.ir/api/v1/user',
-    #     data={'name': full_name, 'email': email, 'password': password, 'passwordConfirm': confirm_pass})
+            infoPais = requests.get(f'https://restcountries.com/v3.1/name/{paisIp}')
+            responsePais = infoPais.json()
+            bandera = responsePais[0]['flags']['png'] 
+            nombre = responsePais[0]['name']['common']
+            capital = responsePais[0]['capital'][0]
+            region = responsePais[0]['region']
+            poblacion = responsePais[0]['population']
 
 
-    #     cur.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', [message.author.id, full_name])
-    #     connectionDB.commit()
-    #     await message.channel.send('Usuario Creado!')
+            infoClima = requests.get(f'https://weatherdbi.herokuapp.com/data/weather/{paisIp}')            
+            responseClima = infoClima.json()
+            hora = responseClima['currentConditions']['dayhour']
+            temperatura = responseClima['currentConditions']['temp']['c']
+            clima = responseClima['currentConditions']['comment']
+            climaimg = responseClima['currentConditions']['iconURL']
 
 
-    # #Eliminar un Usuario
-    # if message.content.startswith('!BorrarUsuario'):
-    #     cur.execute('DELETE FROM users WHERE discord_id = ?', [message.author.id])
-    #     connectionDB.commit()
-    #     await message.channel.send('Usuario Eliminado!')
+            await message.channel.send(f'Hello, <@{message.author.id}>')
+            await message.channel.send(bandera)
+            await message.channel.send(f'Country :  {nombre}')
+            await message.channel.send(f'Capital :  {capital}')
+            await message.channel.send(f'Region : {region}')
+            await message.channel.send(f'Population : {poblacion}')
+            await message.channel.send(f'Day and hour :  {hora}')
+            await message.channel.send(f'Temperature at this time :  {temperatura}°C')
+            await message.channel.send(f'The weather at this time :  {clima}')
+            await message.channel.send(climaimg)
+
+
+
+    #Crear un Usuario 
+    if message.content.startswith('!CrearUsuario'):
+        first_name = message.content.split(' ')[1]
+        last_name = message.content.split(' ')[2]
+        full_name = f'{first_name} {last_name}'
+        # email = message.content.split(' ')[3]
+        # password = message.content.split(' ')[4]
+        # confirm_pass = message.content.split(' ')[5]
+
+        # response = requests.post('http://api.cup2022.ir/api/v1/user',
+        # data={'name': full_name, 'email': email, 'password': password, 'passwordConfirm': confirm_pass})
+
+
+        cur.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', [message.author.id, full_name])
+        connectionDB.commit()
+        await message.channel.send('Usuario Creado!')
+
+
+    #Eliminar un Usuario
+    if message.content.startswith('!BorrarUsuario'):
+        cur.execute('DELETE FROM users WHERE discord_id = ?', [message.author.id])
+        connectionDB.commit()
+        await message.channel.send('Usuario Eliminado!')
 
     
 
