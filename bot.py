@@ -1,4 +1,4 @@
-import tempfile
+from datetime import date
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -152,35 +152,115 @@ async def on_message(message):
             await message.channel.send(f'The weather at this time :  {clima}')
             await message.channel.send(climaimg)
 
+    #info de beisboll
+
+    #Info del jugador
+    if message.content.startswith('!jugador'):
+        nameJugador = message.content.split(' ')[1]
+        lastJugador = message.content.split(' ')[2]
+        full_name = f'{nameJugador} {lastJugador}'
+
+        info = requests.get(f'https://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27&name_part=%27{full_name}%25%27')
+        responseIp = info.json()
+        JugadorID = responseIp['search_player_all']['queryResults']['row']['player_id']
+        p = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{JugadorID}/headshot/67/current"
+
+        infoJugador = requests.get(f"http://lookup-service-prod.mlb.com/json/named.player_info.bam?sport_code='mlb'&player_id='{JugadorID}'")
+        responseJugador = infoJugador.json()
+
+        Jugador = responseJugador['player_info']['queryResults']['row']['name_display_last_first']
+        Nacionalidad = responseJugador['player_info']['queryResults']['row']['birth_country']
+        Nacimiento = responseJugador['player_info']['queryResults']['row']['birth_date']
+        Ciudad = responseJugador['player_info']['queryResults']['row']['birth_city']
+        Altura = responseJugador['player_info']['queryResults']['row']['height_feet']
+        Edad = responseJugador['player_info']['queryResults']['row']['age']
+        Peso = responseJugador['player_info']['queryResults']['row']['weight']
+        EquipoActual = responseJugador['player_info']['queryResults']['row']['team_name']
+        bateo = responseJugador['player_info']['queryResults']['row']['bats']
+        posicion = responseJugador['player_info']['queryResults']['row']['primary_position_txt']
+        twitter = responseJugador['player_info']['queryResults']['row']['twitter_id']
+        debut = responseJugador['player_info']['queryResults']['row']['pro_debut_date']
+       
+        date = Nacimiento.split('T')[0]
+        date_debut = debut.split('T')[0]
+        #weight in kg
+        weight_kg = int(Peso) / 2.205
+        kg_round = round(weight_kg, 2)
+        #height in m
+        height_m = int(Altura) / 3.281
+        m_round = round(height_m, 2)
 
 
-    #Crear un Usuario 
-    if message.content.startswith('!CrearUsuario'):
-        first_name = message.content.split(' ')[1]
-        last_name = message.content.split(' ')[2]
-        full_name = f'{first_name} {last_name}'
-        # email = message.content.split(' ')[3]
-        # password = message.content.split(' ')[4]
-        # confirm_pass = message.content.split(' ')[5]
+        await message.channel.send(f'{p}')
+        await message.channel.send(f'Apellido, Nombre: {Jugador}')
+        await message.channel.send(f'Nacionalidad: {Nacionalidad}')
+        await message.channel.send(f'Ciudad: {Ciudad}')
+        await message.channel.send(f'Nacimiento: {date}')
+        await message.channel.send(f'Edad: {Edad}')
+        await message.channel.send(f'Altura: {m_round}')
+        await message.channel.send(f'Peso: {kg_round}')
+        await message.channel.send(f'Equipo Actua: {EquipoActual}')
+        await message.channel.send(f'Debuto en: {date_debut}')  
+        await message.channel.send(f'Batea en el perfil: {bateo}')
+        await message.channel.send(f'Juega en: {posicion}')
+        await message.channel.send(f'Su twitter es: {twitter}')  
+        
+        
 
-        # response = requests.post('http://api.cup2022.ir/api/v1/user',
-        # data={'name': full_name, 'email': email, 'password': password, 'passwordConfirm': confirm_pass})
+        
 
 
-        cur.execute('INSERT INTO users (discord_id, name) VALUES (?, ?)', [message.author.id, full_name])
-        connectionDB.commit()
-        await message.channel.send('Usuario Creado!')
 
 
-    #Eliminar un Usuario
-    if message.content.startswith('!BorrarUsuario'):
-        cur.execute('DELETE FROM users WHERE discord_id = ?', [message.author.id])
-        connectionDB.commit()
-        await message.channel.send('Usuario Eliminado!')
 
-    
+
+
+
+
+
+
+
+
+
+           
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 client.run(os.environ['TOKEN'])
+
+
+
+    # #Crear un Usuario 
+    # if message.content.startswith('!CrearUsuario'):
+    #     first_name = message.content.split(' ')[1]
+    #     last_name = message.content.split(' ')[2]
+    #     full_name = f'{first_name} {last_name}'
+    #     email = message.content.split(' ')[3]
+    #     password = message.content.split(' ')[4]
+    #     confirm_pass = message.content.split(' ')[5]
+
+    #     # response = requests.post('http://api.cup2022.ir/api/v1/user', 
+    #     # data={'name': full_name, 'email': email, 'password': password, 'passwordConfirm': confirm_pass})
+
+
+    #     cur.execute('INSERT INTO users (discord_id, name, email, password) VALUES (?, ?, ?, ?))', [message.author.id, full_name, email, password])
+    #     connectionDB.commit()
+    #     await message.channel.send('Usuario Creado!')
+
+
+    # #Eliminar un Usuario
+    # if message.content.startswith('!BorrarUsuario'):
+    #     cur.execute('DELETE FROM users WHERE discord_id = ?', [message.author.id])
+    #     connectionDB.commit()
+    #     await message.channel.send('Usuario Eliminado!')
