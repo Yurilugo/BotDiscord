@@ -1,4 +1,5 @@
 from datetime import date
+import imghdr
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -53,7 +54,7 @@ async def on_message(message):
         await message.channel.send(f'el resultado es: {resultado}')
 
 #criptomoneda
-    if message.content.startswith('$cryto'):
+    if message.content.startswith('!crypto'):
         moneda = message.content.split(' ')[1]
         divisa = message.content.split(' ')[2]
         info = requests.get(f'https://min-api.cryptocompare.com/data/pricemultifull?fsyms={moneda}&tsyms={divisa}')
@@ -153,14 +154,14 @@ async def on_message(message):
             await message.channel.send(climaimg)
 
 #info de beisboll
-#Info del jugador
+#ID del jugador
     def JugadorID(full_name):
         info = requests.get(f'https://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code=%27&name_part=%27{full_name}%25%27')
         responseIp = info.json()
         JugadorID = responseIp['search_player_all']['queryResults']['row']['player_id']
         return JugadorID
 
-
+#info jugadores
     if message.content.startswith('!jugador'):
         nameJugador = message.content.split(' ')[1]
         lastJugador = message.content.split(' ')[2]
@@ -212,18 +213,10 @@ async def on_message(message):
 #estadisticas por año  
     if message.content.startswith('!estadisticas'):
 
-        nameJugador = message.content.split(' ')[1]
-        lastJugador = message.content.split(' ')[2]
-        year =  message.content.split(' ')[3]
-        full_name = f'{nameJugador} {lastJugador}'
-        # result_id = JugadorID(full_name)
-
-        if year == "":
-
-            # nameJugador = message.content.split(' ')[1]
-            # lastJugador = message.content.split(' ')[2]
-            # year =  message.content.split(' ')[3]
-            # full_name = f'{nameJugador} {lastJugador}'
+            nameJugador = message.content.split(' ')[1]
+            lastJugador = message.content.split(' ')[2]
+            year =  message.content.split(' ')[3]
+            full_name = f'{nameJugador} {lastJugador}'
             result_id = JugadorID(full_name)
             p = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{result_id}/headshot/67/current"   
             details = requests.get(f"http://lookup-service-prod.mlb.com/json/named.sport_hitting_tm.bam?league_list_id='mlb'&game_type='R'&season='{year}'&player_id='{result_id}'")
@@ -252,10 +245,6 @@ async def on_message(message):
             await message.channel.send(f'HomeRuns: {HomeRun}')
             await message.channel.send(f'Avg: {Avg}')
     
-        else:
-            await message.channel.send(f'Error pide ayuda a la guia usando el codigo !help')
-    
-
 
 #estadisticas por trayectoria 
     if message.content.startswith('!trayectoria'):
@@ -264,7 +253,7 @@ async def on_message(message):
         lastJugador = message.content.split(' ')[2]
         full_name = f'{nameJugador} {lastJugador}'
         result_id = JugadorID(full_name)
-        p = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{result_id}/headshot/67/current"   
+        img = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/{result_id}/headshot/67/current"   
         details = requests.get(f"http://lookup-service-prod.mlb.com/json/named.sport_career_hitting.bam?league_list_id='mlb'&game_type='R'&player_id='{result_id}'")
         response_career = details.json()
 
@@ -277,8 +266,10 @@ async def on_message(message):
         TurnoAlBate  = response_career['sport_career_hitting']['queryResults']['row']['ab']
         Jjugados = response_career['sport_career_hitting']['queryResults']['row']['g']
         CarreraImpulsada = response_career['sport_career_hitting']['queryResults']['row']['rbi'] 
+        cargando = await message.channel.send('Cargando...')
 
-        await message.channel.send(f'{p}')
+        
+        await message.channel.send(f'{img}')
         await message.channel.send(f'Juegos jugados: {Jjugados} ')
         await message.channel.send(f'Turnos al bate: {TurnoAlBate}')
         await message.channel.send(f'Carreras: {Carreras}')
@@ -287,11 +278,23 @@ async def on_message(message):
         await message.channel.send(f'Base por bola: {BasexBola}')
         await message.channel.send(f'Ponches: {Ponches}')
         await message.channel.send(f'HomeRuns: {HomeRun}')
-        await message.channel.send(f'Avg: {Avg}') 
-
-# Info equipo
+        await message.channel.send(f'Avg: {Avg}')
 
 
+
+#ayuda 
+    if message.content.startswith('$help'):
+        cargando = await message.channel.send('Cargando...')
+        await cargando.edit(content = f'''Hola, <@{message.author.id}>, esta es la lista de comandos que se pueden usar:
+
+        - Para la Calculadora **!calc** y la operación.
+        - Para dar el valor de una criptomoneda **!crypto** más la cripto y la divisa.
+        - Para ver el clima de los paises y ciudades se debe poner **!clima** y el nombre del país o ciudad.
+        - Para ver información de los paises **!pais** y el nombre del país.
+        - Para obtener la informacion de los jugadores de la Grandes Ligas de Béisbol se debe poner **!jugador** y el nombre y apellido.
+        - Para saber las estadisticas por trayectoria de los jugadores se debe poner **!trayectoria** y el nombre y apellido.
+        - Para saber las estadisticas por temporada de los jugadores se debe poner **!estadisticas** y nombre, apellido y año.
+        ''')
 
         
 
